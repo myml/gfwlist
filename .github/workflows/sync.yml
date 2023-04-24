@@ -1,0 +1,22 @@
+name: CI
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *"
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          git remote add upstream https://github.com/gfwlist/gfwlist.git
+          git fetch upstream
+          git reset --hard upstream/master
+          cat gfwlist.txt | base64 -d > gfwlist.plain.txt
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: plain
+          create_branch: true
+          push_options: --force
